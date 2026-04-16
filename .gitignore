@@ -1,3 +1,19 @@
 molecli
 *.exe
 dist/
+
+# Credentials — added by chore/credentials-gitignore batch
+.env
+.env.local
+.env.*.local
+.env.*
+!.env.example
+!.env.sample
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+.secrets/
+.auth-token
+.auth_token
