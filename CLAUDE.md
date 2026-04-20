@@ -118,8 +118,9 @@ molecule agent inspect <agent-id>
 
 ## 7. Known Issues
 
-- **File a GitHub issue before patching silently.** If you encounter a bug or missing feature, open an issue. Do not merge a workaround without a linked issue.
-- There are no known issues documented yet because the repo is new. This section will grow as the CLI is built out.
+See `known-issues.md` at the repo root for the full tracked list.
+
+**Policy:** File a GitHub issue before patching silently. Do not merge a workaround without a linked issue.
 
 ## 8. Early / Stub Repo Status
 
