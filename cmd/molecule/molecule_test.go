@@ -748,3 +748,47 @@ func TestCLI_ConfigList(t *testing.T) {
 		t.Errorf("empty stdout for mol config list")
 	}
 }
+
+func TestCLI_Init(t *testing.T) {
+	exe := mol(t)
+	dir := t.TempDir()
+	cmd := exec.Command(exe, "init")
+	cmd.Dir = dir
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if err != nil {
+		t.Fatalf("mol init: %v\nstderr: %s", err, stderr.String())
+	}
+	f := filepath.Join(dir, "mol.yaml")
+	if _, err := os.Stat(f); err != nil {
+		t.Errorf("mol.yaml not scaffolded at %s", f)
+	}
+	out := stdout.String()
+	if !strings.Contains(out, "Scaffolded") && !strings.Contains(out, "mol.yaml") {
+		t.Errorf("expected scaffolded confirmation in output, got:\n%s", out)
+	}
+}
+
+func TestCLI_Init_AlreadyExists(t *testing.T) {
+	exe := mol(t)
+	dir := t.TempDir()
+	// pre-create mol.yaml
+	os.WriteFile(filepath.Join(dir, "mol.yaml"), []byte("x"), 0o644)
+	cmd := exec.Command(exe, "init")
+	cmd.Dir = dir
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if err == nil {
+		t.Fatalf("expected error when mol.yaml exists, got none")
+	}
+	exitErr, ok := err.(*exec.ExitError)
+	if !ok {
+		t.Fatalf("expected *exec.ExitError, got %T", err)
+	}
+	if exitErr.ExitCode() == 0 {
+		t.Errorf("expected non-zero exit code when mol.yaml exists, got 0")
+	}
+}

@@ -153,11 +153,12 @@ mol platform health
 
 ### Config Commands
 ```
-mol config list        # Show current config
+mol init             # Bootstrap mol.yaml in the current directory (primary entry point)
+mol config list     # Show current config
 mol config set <key> <value>
 mol config get <key>
-mol config init        # Bootstrap ~/.config/molecule/cli.yaml
-mol config view        # Print config file path and current values
+mol config init     # Alias for mol init (bootstrap ~ /.config/molecule/cli.yaml)
+mol config view     # Print config file path and current values
 ```
 
 ### Global Flags
@@ -255,7 +256,7 @@ This repo was initialized 2026-04-16. The following is needed before a functiona
 - [ ] Workspace runtime client (for dev/proxy mode)
 - [ ] Configuration file (e.g., `~/.config/molecule/cli.yaml`) — workspace template per platform rules
 - [ ] Unit tests for core command logic
-- [ ] `molecule init` (bootstrap local workspace config)
+- [x] `molecule init` (bootstrap local workspace config)
 
 **Platform constraint reminders (from `constraints-and-rules.md`):**
 - Postgres is the source of truth. CLI commands that mutate state ultimately write to Postgres via the control plane.

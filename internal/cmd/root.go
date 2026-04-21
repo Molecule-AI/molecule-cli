@@ -87,6 +87,7 @@ func init() {
 	rootCmd.AddCommand(agentCmd)
 	rootCmd.AddCommand(platformCmd)
 	rootCmd.AddCommand(configCmd)
+	rootCmd.AddCommand(initCmd)
 }
 
 // exitError wraps a user-facing error with a specific exit code.
