@@ -122,7 +122,128 @@ See `known-issues.md` at the repo root for the full tracked list.
 
 **Policy:** File a GitHub issue before patching silently. Do not merge a workaround without a linked issue.
 
-## 8. Early / Stub Repo Status
+## 8. Command Reference
+
+Full `mol` command tree. All subcommands follow `molecule <resource> <verb> [flags]` pattern.
+
+### Workspace Commands
+```
+mol workspace create [--name <name>] [--tier <1-4>] [--template <template-id>]
+mol workspace list
+mol workspace inspect <workspace-id>
+mol workspace delete <workspace-id>
+mol workspace restart <workspace-id>
+mol workspace delegate <workspace-id> --task "<prompt>" [--sync|--async]
+mol workspace audit <workspace-id>
+```
+
+### Agent Commands
+```
+mol agent list <workspace-id>
+mol agent inspect <agent-id>
+mol agent send <agent-id> --message "<text>"
+mol agent peers <agent-id>
+```
+
+### Platform Commands
+```
+mol platform audit [--url <platform-url>] [--token <api-token>]
+mol platform health
+```
+
+### Config Commands
+```
+mol config list        # Show current config
+mol config set <key> <value>
+mol config get <key>
+mol config init        # Bootstrap ~/.config/molecule/cli.yaml
+mol config view        # Print config file path and current values
+```
+
+### Global Flags
+| Flag | Description |
+|------|-------------|
+| `--output`, `-o` | Output format: `text` (default), `json`, `yaml` |
+| `--verbose`, `-v` | Increase verbosity (repeat for debug level) |
+| `--config <path>` | Path to config file (default: `~/.config/molecule/cli.yaml`) |
+| `--platform-url <url>` | Override `MOLECULE_API_URL` for this invocation |
+| `--help`, `-h` | Show help for any command |
+
+### Error Codes
+All errors go to stderr with exit codes:
+- **0** — success
+- **1** — runtime error (platform API error, file system error)
+- **2** — usage error (missing required flag, bad argument, unknown subcommand)
+
+Error format: `[resource] [verb]: [specific message]`
+
+Examples:
+```
+mol workspace delete abc123: workspace not found
+mol agent send xyz: authentication failed: invalid API token
+mol: unknown subcommand "agen inspect"
+```
+
+### Output Format Examples
+
+**text (default):**
+```
+Workspace: my-workspace
+  ID:       550e8400-e29b-41d4-a716-446655440000
+  Status:   online
+  Tier:     2
+  Created:  2026-04-01T12:00:00Z
+```
+
+**json:**
+```json
+{"id": "550e8400-e29b-41d4-a716-446655440000", "name": "my-workspace", "status": "online", "tier": 2}
+```
+
+**yaml:**
+```yaml
+id: 550e8400-e29b-41d4-a716-446655440000
+name: my-workspace
+status: online
+tier: 2
+```
+
+## 9. Homebrew Tap Release
+
+Releases are published to the Molecule-AI/homebrew-tap tap. The GitHub Actions workflow handles the formula update automatically when a `v*` tag is pushed.
+
+To release via Homebrew tap:
+1. Push a `v*` tag to GitHub
+2. The GitHub Release workflow attaches a `molecule_*_darwin_arm64.tar.gz` and `molecule_*_darwin_amd64.tar.gz` to the release
+3. The `brew формула` is updated by the workflow to point at the new release assets
+4. Users install via: `brew install molecule-ai/tap/molecule`
+
+Do not manually edit the Homebrew formula. Let the workflow manage it.
+
+## 10. Cross-Platform Binary Build Notes
+
+GoReleaser builds for these targets by default (see `.goreleaser.yml`):
+- `darwin/amd64` — Intel macOS
+- `darwin/arm64` — Apple Silicon macOS
+- `linux/amd64` — Linux x86_64
+- `linux/arm64` — Linux ARM64
+- `windows/amd64` — Windows x86_64 (.exe)
+
+Each target produces a compressed archive (`.tar.gz` on Unix, `.zip` on Windows) with:
+- `molecule` (or `molecule.exe`) binary
+- `completions/` dir with shell completion scripts (`bash`, `zsh`, `fish`, `powershell`)
+
+Install shell completions:
+```bash
+# bash
+source <(molecule completion bash)
+# zsh
+molecule completion zsh > "${fpath[1]}/_molecule"
+# fish
+molecule completion fish | source
+```
+
+## 11. Early / Stub Repo Status
 
 This repo was initialized 2026-04-16. The following is needed before a functional CLI exists:
 
