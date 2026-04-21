@@ -20,15 +20,17 @@ This CLI is the primary user-facing tool for interacting with the Molecule AI pl
 ## 2. Build, Test, and Local Run
 
 ```bash
-# Build the binary to ./bin/molecule
+# Build the binary to ./bin/molecule (or $GOBIN/molecule)
 go build -o bin/molecule ./cmd/molecule
 
-# Run the test suite (24 integration tests)
+# Run tests (none yet; add as commands are implemented)
 go test ./...
 
-# Run the CLI
+# Run the CLI locally (requires platform env vars — see Section 5)
 ./bin/molecule --help
 ```
+
+There is no `main.go` or `cmd/molecule/main.go` yet. Creating it is the first implementation task. The module path will be auto-detected from `go.mod`.
 
 ## 3. Go Module Conventions
 
@@ -120,148 +122,17 @@ See `known-issues.md` at the repo root for the full tracked list.
 
 **Policy:** File a GitHub issue before patching silently. Do not merge a workaround without a linked issue.
 
-## 8. Command Reference
+## 8. Implemented
 
-Full `molecule` command tree. All subcommands follow `molecule <resource> <verb> [flags]` pattern.
-
-### Workspace Commands
-```
-molecule workspace create [--name <name>] [--tier <1-4>] [--template <template-id>]
-molecule workspace list
-molecule workspace inspect <workspace-id>
-molecule workspace delete <workspace-id>
-molecule workspace restart <workspace-id>
-molecule workspace delegate <workspace-id> <target-id> <task>
-molecule workspace audit
-```
-
-### Agent Commands
-```
-molecule agent list [workspace-id]
-molecule agent inspect <agent-id>
-molecule agent send <agent-id> <message>
-molecule agent peers <workspace-id>
-```
-
-### Platform Commands
-```
-molecule platform audit
-molecule platform health
-```
-
-### Config Commands
-```
-molecule init             # Bootstrap molecule.yaml in the current directory
-molecule config list     # Show current config
-molecule config set <key> <value>
-molecule config get <key>
-molecule config init      # Alias for molecule init
-molecule config view     # Print config file path and current values
-```
-
-### Global Flags
-| Flag | Description |
-|------|-------------|
-| `--api-url <url>` | Platform API base URL (env: MOLECULE_API_URL) |
-| `--output`, `-o` | Output format: `table` (default), `json`, `yaml` |
-| `--verbose`, `-v` | Enable verbose (DEBUG-level) output to stderr |
-| `--config <path>` | Path to config file (default: `~/.config/molecule.yaml` or `./molecule.yaml`) |
-| `--help`, `-h` | Show help for any command |
-
-### Error Codes
-All errors go to stderr with exit codes:
-- **0** — success
-- **1** — runtime error (platform API error, file system error)
-- **2** — usage error (missing required flag, bad argument, unknown subcommand)
-
-Error format: `[resource] [verb]: [specific message]`
-
-Examples:
-```
-molecule workspace delete abc123: workspace not found
-molecule agent send xyz: workspace_id unknown for agent "xyz"
-molecule: unknown subcommand "agen inspect"
-```
-
-### Output Format Examples
-
-**text (default):**
-```
-Workspace: my-workspace
-  ID:       550e8400-e29b-41d4-a716-446655440000
-  Status:   online
-  Tier:     2
-  Created:  2026-04-01T12:00:00Z
-```
-
-**json:**
-```json
-{"id": "550e8400-e29b-41d4-a716-446655440000", "name": "my-workspace", "status": "online", "tier": 2}
-```
-
-**yaml:**
-```yaml
-id: 550e8400-e29b-41d4-a716-446655440000
-name: my-workspace
-status: online
-tier: 2
-```
-
-## 9. Homebrew Tap Release
-
-Releases are published to the Molecule-AI/homebrew-tap tap. The GitHub Actions workflow handles the formula update automatically when a `v*` tag is pushed.
-
-To release via Homebrew tap:
-1. Push a `v*` tag to GitHub
-2. The GitHub Release workflow attaches a `molecule_*_darwin_arm64.tar.gz` and `molecule_*_darwin_amd64.tar.gz` to the release
-3. The `brew формула` is updated by the workflow to point at the new release assets
-4. Users install via: `brew install molecule-ai/tap/molecule`
-
-Do not manually edit the Homebrew formula. Let the workflow manage it.
-
-## 10. Cross-Platform Binary Build Notes
-
-GoReleaser builds for these targets by default (see `.goreleaser.yml`):
-- `darwin/amd64` — Intel macOS
-- `darwin/arm64` — Apple Silicon macOS
-- `linux/amd64` — Linux x86_64
-- `linux/arm64` — Linux ARM64
-- `windows/amd64` — Windows x86_64 (.exe)
-
-Each target produces a compressed archive (`.tar.gz` on Unix, `.zip` on Windows) with:
-- `molecule` (or `molecule.exe`) binary
-- `completions/` dir with shell completion scripts (`bash`, `zsh`, `fish`, `powershell`)
-
-Install shell completions:
-```bash
-# bash
-source <(molecule completion bash)
-# zsh
-molecule completion zsh > "${fpath[1]}/_molecule"
-# fish
-molecule completion fish | source
-```
-
-## 11. Implementation Status (as of 2026-04-22)
-
-The CLI has a full command tree and 24 integration tests. Remaining items:
-
+- [x] `cmd/molecule/main.go` — entry point with root command
+- [x] Root command and global flags (`--verbose`, `--output`, `--config`)
+- [x] `workspace create`, `workspace list`, `workspace delete` subcommands
+- [x] `agent inspect`, `agent list` subcommands
+- [x] Control plane API client (initialized with `MOLECULE_API_URL`)
 - [ ] Workspace runtime client (for dev/proxy mode)
-- [ ] Workspace template config (`~/.config/molecule.yaml` scaffold by default)
-- [ ] `molecule completion` shell completion subcommands
-- [ ] `molecule workspace restart` — confirm API endpoint / status code handling
-- [ ] Cross-compile CI matrix (`.github/workflows/release.yml` currently uses plain `go build`)
-
-Done:
-- [x] `cmd/molecule/main.go` — entry point with Cobra root command
-- [x] Root command and global flags (`--verbose`, `--output`, `--config`, `--api-url`)
-- [x] `workspace create`, `workspace list`, `workspace inspect`, `workspace delete`, `workspace restart`, `workspace audit`, `workspace delegate` subcommands
-- [x] `agent list`, `agent inspect`, `agent send`, `agent peers` subcommands
-- [x] `platform audit`, `platform health` subcommands
-- [x] `init`, `config list`, `config get`, `config set`, `config init`, `config view` subcommands
-- [x] Control plane API client (`internal/client/platform.go`)
-- [x] `go test ./...` — 24 integration tests with httptest mock server
-- [x] `.goreleaser.yaml` with all 6 targets wired up
+- [ ] Configuration file (e.g., `~/.config/molecule/cli.yaml`) — workspace template per platform rules
+- [ ] Unit tests for core command logic
+- [ ] `molecule init` (bootstrap local workspace config)
 
 **Platform constraint reminders (from `constraints-and-rules.md`):**
 - Postgres is the source of truth. CLI commands that mutate state ultimately write to Postgres via the control plane.

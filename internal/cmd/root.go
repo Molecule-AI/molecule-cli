@@ -25,18 +25,18 @@ var (
 
 // rootCmd is the top-level molecule command.
 var rootCmd = &cobra.Command{
-	Use:     "molecule",
+	Use:     "mol",
 	Version: Version,
-	Short:   "molecule — Molecule AI platform CLI",
-	Long: `molecule is the CLI for the Molecule AI agent platform.
+	Short:   "mol — Molecule AI platform CLI",
+	Long: `mol is the CLI for the Molecule AI agent platform.
 
 Manage workspaces, inspect agents, audit the platform, and configure
 agent behaviour from the terminal.
 
 Quick start:
-  molecule workspace list
-  molecule agent list
-  molecule platform health`,
+  mol workspace list
+  mol agent list
+  mol platform health`,
 	SilenceUsage:   true,
 	SilenceErrors:  true,
 }
@@ -50,7 +50,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "table",
 		"Output format: table | json | yaml")
 	rootCmd.PersistentFlags().StringVar(&configPath, "config", "",
-		"Path to config file (default ~/.config/molecule.yaml or ./molecule.yaml)")
+		"Path to config file (default ~/.config/mol.yaml or ./mol.yaml)")
 	rootCmd.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
 		return &exitError{code: 2, msg: err.Error()}
 	})
@@ -63,7 +63,7 @@ func Execute() error {
 	if configPath != "" {
 		viper.SetConfigFile(configPath)
 	} else {
-		viper.SetConfigName("molecule")
+		viper.SetConfigName("mol")
 		viper.AddConfigPath("$HOME/.config")
 		viper.AddConfigPath(".")
 	}
@@ -87,7 +87,6 @@ func init() {
 	rootCmd.AddCommand(agentCmd)
 	rootCmd.AddCommand(platformCmd)
 	rootCmd.AddCommand(configCmd)
-	rootCmd.AddCommand(initCmd)
 }
 
 // exitError wraps a user-facing error with a specific exit code.
@@ -123,5 +122,5 @@ func kv(w *tabwriter.Writer, k, v string) {
 }
 
 func versionInfo() string {
-	return fmt.Sprintf("molecule %s (go %s)", Version, runtime.Version())
+	return fmt.Sprintf("mol %s (go %s)", Version, runtime.Version())
 }

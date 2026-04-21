@@ -106,54 +106,48 @@ resulting `go.sum`. Add `go mod verify` to CI as a lint step. Ensure
 
 ## KI-004 — GoReleaser config may not be aligned with go.mod module path
 
-**File:** `.goreleaser.yaml`
-**Status:** ✅ Resolved — `.goreleaser.yaml` added
-**Resolved in:** `main` (commit `47b2804` + this branch)
+**File:** `.github/workflows/release.yml`
+**Status:** ⚠️ Unverified — needs real tag to confirm
 **Severity:** Medium
 
 ### Symptom
-The GoReleaser workflow was wired up but had no `.goreleaser.yaml` config.
-A `v*` tag push could produce an empty release or a binary with the wrong name
-if `builds[].dir` or `builds[].main` were misconfigured.
+The GoReleaser workflow is wired up but has not been tested with a real tag.
+The `gomod.alphaSettings` or `builds[].dir` settings in `.goreleaser.yaml`
+(if it exists) may not correctly resolve the module root. A real `v*` tag
+push could produce an empty release or a binary with the wrong name.
 
-### Resolution
-Added `.goreleaser.yaml` with:
-- `dir: .` — repo root
-- `main: ./cmd/molecule` — main package path
-- `binary: molecule` — output binary name
-- All 6 targets: linux/darwin × amd64/arm64 + windows × amd64
-- `CGO_ENABLED=0` for static binaries
-- Checksum files generated for all archives
+### Impact
+The first release may silently fail or produce a malformed artifact that is
+not usable by platform operators.
 
-`release.yml` still uses plain `go build` per matrix target (GoReleaser is
-configured but not wired into CI yet — the plain build is sufficient for
-v0.1.0). Wire GoReleaser into CI when Homebrew formula + checksum
-verification are needed.
+### Suggested fix
+Before the first release, test goreleaser locally with `goreleaser check`
+and `goreleaser snapshot --clean`. Verify the binary name, module path, and
+target OS/arch match expectations. Ensure `goreleaser.yaml` `builds[].dir`
+is set to `.` (repo root) since the main package is at `cmd/molecule`.
 
 ---
 
 ## KI-005 — No integration test for the full CLI lifecycle
 
-**File:** `tests/` (does not exist)
-**Status:** ✅ Resolved
-**Resolved in:** `cmd/molecule/molecule_test.go` — 24 table-driven tests using httptest mock server.
+**File:** `tests/` (does not exist)  
+**Status:** Not yet implemented  
 **Severity:** Medium
 
 ### Symptom
-There were no tests at all (per `go test ./...` — no packages match).
-As subcommands were built, there was no test harness for end-to-end CLI testing
+There are no tests at all (per `go test ./...` — no packages match).
+As subcommands are built, there is no test harness for end-to-end CLI testing
 (e.g. `molecule workspace create --name test --output json` → verify JSON output).
 
 ### Impact
-Each subcommand was shipped without regression protection. Manual testing
-was required for every release.
+Each subcommand will be shipped without regression protection. Manual testing
+is required for every release. The absence of a `tests/` directory also means
+there is no fixture for CLI integration testing with recorded API responses.
 
 ### Suggested fix
 Add `tests/` with:
 - `cmd/molecule/molecule_test.go` — table-driven tests for each subcommand
   using `exec.Command("molecule", ...)` against a built binary
-- Use a httptest mock server for offline testing
+- Use `molecule-sdk-python` fixture server or recorded API responses for
+  offline testing
 - Add `go test ./...` to CI; require >0 test packages before merge
-
-**✅ Done:** 24 integration tests covering all 18 subcommands, error paths,
-and structured output. `go test ./...` passes, CI job added to `release.yml`.
