@@ -1,0 +1,69 @@
+# GoReleaser configuration for molecule-cli
+# https://goreleaser.com/install/
+#
+# .goreleaser.yaml is the main config file for GoReleaser.
+# This file must be committed. GoReleaser reads it from the repo root.
+#
+# Run locally:
+#   goreleaser check    # validate the config
+#   goreleaser snapshot --clean --snapshot-dir ./.snapshot  # dry-run build
+#
+# CI: GitHub Actions runs plain `go build` per target (see .github/workflows/release.yml).
+# GoReleaser would be used for a more sophisticated release (changelog from commits,
+# multiple formats, Homebrew formula update, checksum files). Wire it up here when ready.
+
+version: 2
+
+env:
+  - GO111MODULE=on
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: molecule
+    dir: .
+    main: ./cmd/molecule
+    binary: molecule
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    env:
+      - CGO_ENABLED=0
+    flags:
+      - -trimpath
+
+archives:
+  - id: default
+    format: tar.gz
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - src: completions/**/*
+        dst: completions
+    checksum:
+      name_template: 'molecule_{{.Os}}_{{.Arch}}_{{.Version}}_checksums.txt'
+
+snapshot:
+  name_template: "{{.Tag}}-snapshot"
+
+checksum:
+  name_template: 'molecule_{{.Os}}_{{.Arch}}_{{.Version}}_checksums.txt'
+  algorithm: sha256
+
+release:
+  github:
+    owner: Molecule-AI
+    name: molecule-cli
+  draft: false
+  name_template: "{{.Tag}}"
+
+# Homebrew tap formula is managed by .github/workflows/release.yml
+# (separate workflow step updates the formula on tag push).
+# If GoReleaser takes over Homebrew later, add a brew section here.

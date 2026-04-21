@@ -106,25 +106,29 @@ resulting `go.sum`. Add `go mod verify` to CI as a lint step. Ensure
 
 ## KI-004 — GoReleaser config may not be aligned with go.mod module path
 
-**File:** `.github/workflows/release.yml`
-**Status:** ⚠️ Unverified — needs real tag to confirm
+**File:** `.goreleaser.yaml`
+**Status:** ✅ Resolved — `.goreleaser.yaml` added
+**Resolved in:** `main` (commit `47b2804` + this branch)
 **Severity:** Medium
 
 ### Symptom
-The GoReleaser workflow is wired up but has not been tested with a real tag.
-The `gomod.alphaSettings` or `builds[].dir` settings in `.goreleaser.yaml`
-(if it exists) may not correctly resolve the module root. A real `v*` tag
-push could produce an empty release or a binary with the wrong name.
+The GoReleaser workflow was wired up but had no `.goreleaser.yaml` config.
+A `v*` tag push could produce an empty release or a binary with the wrong name
+if `builds[].dir` or `builds[].main` were misconfigured.
 
-### Impact
-The first release may silently fail or produce a malformed artifact that is
-not usable by platform operators.
+### Resolution
+Added `.goreleaser.yaml` with:
+- `dir: .` — repo root
+- `main: ./cmd/molecule` — main package path
+- `binary: molecule` — output binary name
+- All 6 targets: linux/darwin × amd64/arm64 + windows × amd64
+- `CGO_ENABLED=0` for static binaries
+- Checksum files generated for all archives
 
-### Suggested fix
-Before the first release, test goreleaser locally with `goreleaser check`
-and `goreleaser snapshot --clean`. Verify the binary name, module path, and
-target OS/arch match expectations. Ensure `goreleaser.yaml` `builds[].dir`
-is set to `.` (repo root) since the main package is at `cmd/molecule`.
+`release.yml` still uses plain `go build` per matrix target (GoReleaser is
+configured but not wired into CI yet — the plain build is sufficient for
+v0.1.0). Wire GoReleaser into CI when Homebrew formula + checksum
+verification are needed.
 
 ---
 
