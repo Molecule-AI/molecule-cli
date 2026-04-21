@@ -130,24 +130,26 @@ is set to `.` (repo root) since the main package is at `cmd/molecule`.
 
 ## KI-005 — No integration test for the full CLI lifecycle
 
-**File:** `tests/` (does not exist)  
-**Status:** Not yet implemented  
+**File:** `tests/` (does not exist)
+**Status:** ✅ Resolved
+**Resolved in:** `cmd/molecule/molecule_test.go` — 24 table-driven tests using httptest mock server.
 **Severity:** Medium
 
 ### Symptom
-There are no tests at all (per `go test ./...` — no packages match).
-As subcommands are built, there is no test harness for end-to-end CLI testing
+There were no tests at all (per `go test ./...` — no packages match).
+As subcommands were built, there was no test harness for end-to-end CLI testing
 (e.g. `molecule workspace create --name test --output json` → verify JSON output).
 
 ### Impact
-Each subcommand will be shipped without regression protection. Manual testing
-is required for every release. The absence of a `tests/` directory also means
-there is no fixture for CLI integration testing with recorded API responses.
+Each subcommand was shipped without regression protection. Manual testing
+was required for every release.
 
 ### Suggested fix
 Add `tests/` with:
 - `cmd/molecule/molecule_test.go` — table-driven tests for each subcommand
   using `exec.Command("molecule", ...)` against a built binary
-- Use `molecule-sdk-python` fixture server or recorded API responses for
-  offline testing
+- Use a httptest mock server for offline testing
 - Add `go test ./...` to CI; require >0 test packages before merge
+
+**✅ Done:** 24 integration tests covering all 18 subcommands, error paths,
+and structured output. `go test ./...` passes, CI job added to `release.yml`.
