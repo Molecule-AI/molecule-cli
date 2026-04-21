@@ -27,14 +27,15 @@ Format per entry:
 
 ## KI-001 — No entry point yet (`cmd/molecule/main.go` does not exist)
 
-**File:** `cmd/molecule/main.go`  
-**Status:** Not yet implemented  
-**Severity:** Critical
+**File:** `cmd/molecule/main.go`
+**Status:** ✅ Resolved
+**Resolved in:** `feat/cli-full-command-tree` branch, commit "feat: implement full CLI command tree"
 
 ### Symptom
-The repo is initialized as a Go module but has no `cmd/molecule/main.go`. Running
-`go build ./cmd/molecule` or `go run ./cmd/molecule` fails with
-"package cmd/molecule: cannot find module" or "build failed".
+`cmd/molecule/main.go` exists and calls `cmd.Execute()`. Root command is wired
+with global flags (`--verbose`, `--output`, `--config`, `--api-url`). All
+subcommand groups registered: workspace (7 commands), agent (4 commands),
+platform (2 commands), config (5 commands). Binary builds to `bin/mol`.
 
 ### Impact
 The CLI is not runnable. No workspace management, agent inspection, or any other
@@ -50,9 +51,11 @@ See the stub checklist in `CLAUDE.md` Section 8.
 
 ## KI-002 — No API client; all commands will make raw HTTP calls
 
-**File:** `cmd/molecule/` (no API client package yet)  
-**Status:** Not yet implemented  
-**Severity:** High
+**File:** `cmd/molecule/` (no API client package yet)
+**Status:** ✅ Partially resolved
+**Resolved in:** `internal/client/platform.go` exists with workspace and agent
+operations; `runHTTP` helper in `internal/cmd/http.go` used by `agent send` and
+`workspace delegate`. Remaining: workspace runtime client (dev/proxy mode).
 
 ### Symptom
 There is no `internal/client/` or `pkg/api/` package. Any subcommand
@@ -76,9 +79,10 @@ are implemented.
 
 ## KI-003 — `go.sum` may contain entries from non-release toolchains
 
-**File:** `go.sum`  
-**Status:** Identified  
-**Severity:** Low
+**File:** `go.sum`
+**Status:** ✅ Resolved
+**Resolved in:** `go mod tidy` run on `feat/cli-full-command-tree`; `go.sum` regenerated
+clean. Dependencies: cobra v1.10.2, viper v1.21.0, their transitive deps.
 
 ### Symptom
 The `go.sum` file was generated during initial module setup. It may contain
@@ -102,8 +106,8 @@ resulting `go.sum`. Add `go mod verify` to CI as a lint step. Ensure
 
 ## KI-004 — GoReleaser config may not be aligned with go.mod module path
 
-**File:** `.github/workflows/release.yml`  
-**Status:** Not verified  
+**File:** `.github/workflows/release.yml`
+**Status:** ⚠️ Unverified — needs real tag to confirm
 **Severity:** Medium
 
 ### Symptom
