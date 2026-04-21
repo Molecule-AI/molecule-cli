@@ -1,6 +1,6 @@
 module github.com/Molecule-AI/molecule-cli
 
-go 1.25.0
+go 1.23
 
 require (
 	github.com/charmbracelet/bubbletea v1.3.10

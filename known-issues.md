@@ -28,49 +28,31 @@ Format per entry:
 ## KI-001 — No entry point yet (`cmd/molecule/main.go` does not exist)
 
 **File:** `cmd/molecule/main.go`  
-**Status:** Not yet implemented  
+**Status:** Resolved (PR: `feat/cli-workspace-commands`)  
 **Severity:** Critical
 
-### Symptom
-The repo is initialized as a Go module but has no `cmd/molecule/main.go`. Running
-`go build ./cmd/molecule` or `go run ./cmd/molecule` fails with
-"package cmd/molecule: cannot find module" or "build failed".
+### Resolution
+`cmd/molecule/main.go` is implemented with cobra root command, global flags
+(`--api-url`, `--verbose`, `--output`), and `workspace list/get` subcommands.
+Global flags are wired to `MOLECULE_API_URL` env var. CLI is runnable with
+`go build -o bin/molecule ./cmd/molecule && ./bin/molecule --help`.
 
-### Impact
-The CLI is not runnable. No workspace management, agent inspection, or any other
-CLI command exists. The repo is a stub.
-
-### Suggested fix
-Implement `cmd/molecule/main.go` with a root `cobra.Command` that registers
-subcommands. Wire up global flags (`--verbose`, `--output`, `--config`).
-Wire `MOLECULE_API_URL` env var as the default for the API base URL.
-See the stub checklist in `CLAUDE.md` Section 8.
+Still needed for full completion: workspace create/delete, agent list/inspect,
+config file support, unit tests.
 
 ---
 
 ## KI-002 — No API client; all commands will make raw HTTP calls
 
 **File:** `cmd/molecule/` (no API client package yet)  
-**Status:** Not yet implemented  
+**Status:** Partially resolved (basic client in `internal/client/platform.go`)  
 **Severity:** High
 
-### Symptom
-There is no `internal/client/` or `pkg/api/` package. Any subcommand
-implementation will need to import the platform SDK (`molecule-sdk-python`) via
-a Go FFI wrapper, make raw `net/http` calls directly, or wait for a Go SDK to be
-built. Neither exists yet.
-
-### Impact
-Subcommand implementations will either duplicate HTTP client logic or require
-architecting a clean API client interface before the first command can be
-meaningfully built.
-
-### Suggested fix
-Before implementing subcommands, define `internal/api/client.go` with a
-`Client` struct wrapping `*http.Client`. Implement methods for workspace and
-agent operations. Add a `ClientOption` functional options pattern for
-configuring base URL and auth. Document the API endpoints in `docs/` as they
-are implemented.
+### Resolution
+`internal/client/platform.go` provides a thin `Platform` client with
+`ListWorkspaces()` and `GetWorkspace(id)` using only the standard library.
+`Agent` methods and write operations (create/delete) still need to be added.
+The client is used by `workspace list` and `workspace get` commands.
 
 ---
 
@@ -103,24 +85,15 @@ resulting `go.sum`. Add `go mod verify` to CI as a lint step. Ensure
 ## KI-004 — GoReleaser config may not be aligned with go.mod module path
 
 **File:** `.github/workflows/release.yml`  
-**Status:** Not verified  
+**Status:** Resolved (PR: `feat/cli-workspace-commands`)  
 **Severity:** Medium
 
-### Symptom
-The GoReleaser workflow is wired up but has not been tested with a real tag.
-The `gomod.alphaSettings` or `builds[].dir` settings in `.goreleaser.yaml`
-(if it exists) may not correctly resolve the module root. A real `v*` tag
-push could produce an empty release or a binary with the wrong name.
-
-### Impact
-The first release may silently fail or produce a malformed artifact that is
-not usable by platform operators.
-
-### Suggested fix
-Before the first release, test goreleaser locally with `goreleaser check`
-and `goreleaser snapshot --clean`. Verify the binary name, module path, and
-target OS/arch match expectations. Ensure `goreleaser.yaml` `builds[].dir`
-is set to `.` (repo root) since the main package is at `cmd/molecule`.
+### Resolution
+Fixed the CI workflow build path: `./cmd/molecli` → `./cmd/molecule`
+(matching the actual package at `cmd/molecule/main.go`). Also corrected
+`go-version: '1.25'` → `go-version: '1.23'` and release artifact pattern
+`molecli-*` → `molecule-*` to match the binary name. Still needs
+`go mod tidy` run in CI to keep `go.sum` clean.
 
 ---
 
