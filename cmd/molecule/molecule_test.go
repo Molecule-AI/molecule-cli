@@ -193,13 +193,10 @@ func mockServer(t *testing.T, basePath string) *httptest.Server {
 }
 
 // repoRoot returns the repo root directory.
-// Assumes this file is at cmd/molecule/molecule_test.go.
-// ../../.. from cmd/molecule/ -> the module root.
+// CI runs tests from the repo checkout dir, so cwd is the right anchor.
 func repoRoot() string {
-	// Use os.Args[0] as a stable anchor: the test binary path.
-	// We walk up 3 levels from the test binary location.
-	exe, _ := os.Executable()
-	return filepath.Join(filepath.Dir(exe), "..", "..", "..")
+	cwd, _ := os.Getwd()
+	return cwd
 }
 
 // mol returns the path to the CLI binary, building it if needed.
