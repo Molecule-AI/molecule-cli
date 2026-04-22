@@ -98,9 +98,12 @@ func runConfigSet(cmd *cobra.Command, args []string) error {
 	}
 	configFile := filepath.Join(configDir, "molecule.yaml")
 
-	// Use SafeWriteConfig to atomically write key=value to the config file.
-	// SafeWriteConfig only writes keys that were explicitly set (not defaults),
-	// and refuses to overwrite an existing file unless it's explicitly asked.
+	// Create a fresh viper instance scoped to the target config file.
+	// Read existing values (if any), set the new key, then atomically write.
+	v := viper.New()
+	v.SetConfigFile(configFile)
+	_ = v.ReadInConfig() // ignore not-found; we write only the new key below
+	v.Set(key, value)
 	if err := v.SafeWriteConfig(); err != nil {
 		return fmt.Errorf("config set: write %s: %w", configFile, err)
 	}
