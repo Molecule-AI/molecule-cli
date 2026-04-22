@@ -20,17 +20,15 @@ This CLI is the primary user-facing tool for interacting with the Molecule AI pl
 ## 2. Build, Test, and Local Run
 
 ```bash
-# Build the binary to ./bin/molecule (or $GOBIN/molecule)
+# Build the binary to ./bin/molecule
 go build -o bin/molecule ./cmd/molecule
 
-# Run tests (none yet; add as commands are implemented)
+# Run the test suite (24 integration tests)
 go test ./...
 
-# Run the CLI locally (requires platform env vars — see Section 5)
+# Run the CLI
 ./bin/molecule --help
 ```
-
-There is no `main.go` or `cmd/molecule/main.go` yet. Creating it is the first implementation task. The module path will be auto-detected from `go.mod`.
 
 ## 3. Go Module Conventions
 
@@ -124,50 +122,50 @@ See `known-issues.md` at the repo root for the full tracked list.
 
 ## 8. Command Reference
 
-Full `mol` command tree. All subcommands follow `molecule <resource> <verb> [flags]` pattern.
+Full `molecule` command tree. All subcommands follow `molecule <resource> <verb> [flags]` pattern.
 
 ### Workspace Commands
 ```
-mol workspace create [--name <name>] [--tier <1-4>] [--template <template-id>]
-mol workspace list
-mol workspace inspect <workspace-id>
-mol workspace delete <workspace-id>
-mol workspace restart <workspace-id>
-mol workspace delegate <workspace-id> --task "<prompt>" [--sync|--async]
-mol workspace audit <workspace-id>
+molecule workspace create [--name <name>] [--tier <1-4>] [--template <template-id>]
+molecule workspace list
+molecule workspace inspect <workspace-id>
+molecule workspace delete <workspace-id>
+molecule workspace restart <workspace-id>
+molecule workspace delegate <workspace-id> <target-id> <task>
+molecule workspace audit
 ```
 
 ### Agent Commands
 ```
-mol agent list <workspace-id>
-mol agent inspect <agent-id>
-mol agent send <agent-id> --message "<text>"
-mol agent peers <agent-id>
+molecule agent list [workspace-id]
+molecule agent inspect <agent-id>
+molecule agent send <agent-id> <message>
+molecule agent peers <workspace-id>
 ```
 
 ### Platform Commands
 ```
-mol platform audit [--url <platform-url>] [--token <api-token>]
-mol platform health
+molecule platform audit
+molecule platform health
 ```
 
 ### Config Commands
 ```
-mol init             # Bootstrap mol.yaml in the current directory (primary entry point)
-mol config list     # Show current config
-mol config set <key> <value>
-mol config get <key>
-mol config init     # Alias for mol init (bootstrap ~ /.config/molecule/cli.yaml)
-mol config view     # Print config file path and current values
+molecule init             # Bootstrap molecule.yaml in the current directory
+molecule config list     # Show current config
+molecule config set <key> <value>
+molecule config get <key>
+molecule config init      # Alias for molecule init
+molecule config view     # Print config file path and current values
 ```
 
 ### Global Flags
 | Flag | Description |
 |------|-------------|
-| `--output`, `-o` | Output format: `text` (default), `json`, `yaml` |
-| `--verbose`, `-v` | Increase verbosity (repeat for debug level) |
-| `--config <path>` | Path to config file (default: `~/.config/molecule/cli.yaml`) |
-| `--platform-url <url>` | Override `MOLECULE_API_URL` for this invocation |
+| `--api-url <url>` | Platform API base URL (env: MOLECULE_API_URL) |
+| `--output`, `-o` | Output format: `table` (default), `json`, `yaml` |
+| `--verbose`, `-v` | Enable verbose (DEBUG-level) output to stderr |
+| `--config <path>` | Path to config file (default: `~/.config/molecule.yaml` or `./molecule.yaml`) |
 | `--help`, `-h` | Show help for any command |
 
 ### Error Codes
@@ -180,9 +178,9 @@ Error format: `[resource] [verb]: [specific message]`
 
 Examples:
 ```
-mol workspace delete abc123: workspace not found
-mol agent send xyz: authentication failed: invalid API token
-mol: unknown subcommand "agen inspect"
+molecule workspace delete abc123: workspace not found
+molecule agent send xyz: workspace_id unknown for agent "xyz"
+molecule: unknown subcommand "agen inspect"
 ```
 
 ### Output Format Examples
@@ -244,19 +242,26 @@ molecule completion zsh > "${fpath[1]}/_molecule"
 molecule completion fish | source
 ```
 
-## 11. Early / Stub Repo Status
+## 11. Implementation Status (as of 2026-04-22)
 
-This repo was initialized 2026-04-16. The following is needed before a functional CLI exists:
+The CLI has a full command tree and 24 integration tests. Remaining items:
 
-- [ ] `cmd/molecule/main.go` — entry point with root command
-- [ ] Root command and global flags (`--verbose`, `--output`, `--config`)
-- [ ] `workspace create`, `workspace list`, `workspace delete` subcommands
-- [ ] `agent inspect`, `agent list` subcommands
-- [ ] Control plane API client (initialized with `MOLECULE_API_URL`)
 - [ ] Workspace runtime client (for dev/proxy mode)
-- [ ] Configuration file (e.g., `~/.config/molecule/cli.yaml`) — workspace template per platform rules
-- [ ] Unit tests for core command logic
-- [x] `molecule init` (bootstrap local workspace config)
+- [ ] Workspace template config (`~/.config/molecule.yaml` scaffold by default)
+- [ ] `molecule completion` shell completion subcommands
+- [ ] `molecule workspace restart` — confirm API endpoint / status code handling
+- [ ] Cross-compile CI matrix (`.github/workflows/release.yml` currently uses plain `go build`)
+
+Done:
+- [x] `cmd/molecule/main.go` — entry point with Cobra root command
+- [x] Root command and global flags (`--verbose`, `--output`, `--config`, `--api-url`)
+- [x] `workspace create`, `workspace list`, `workspace inspect`, `workspace delete`, `workspace restart`, `workspace audit`, `workspace delegate` subcommands
+- [x] `agent list`, `agent inspect`, `agent send`, `agent peers` subcommands
+- [x] `platform audit`, `platform health` subcommands
+- [x] `init`, `config list`, `config get`, `config set`, `config init`, `config view` subcommands
+- [x] Control plane API client (`internal/client/platform.go`)
+- [x] `go test ./...` — 24 integration tests with httptest mock server
+- [x] `.goreleaser.yaml` with all 6 targets wired up
 
 **Platform constraint reminders (from `constraints-and-rules.md`):**
 - Postgres is the source of truth. CLI commands that mutate state ultimately write to Postgres via the control plane.
