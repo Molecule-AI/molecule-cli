@@ -243,7 +243,7 @@ func TestCLI_Help(t *testing.T) {
 			cmd.Dir = root
 			err := cmd.Run()
 			if err != nil {
-				t.Fatalf("mol %v: %v\nstdout: %s\nstderr: %s", strings.Join(tc.args, " "), err, stdout.String(), stderr.String())
+				t.Fatalf("molecule %v: %v\nstdout: %s\nstderr: %s", strings.Join(tc.args, " "), err, stdout.String(), stderr.String())
 			}
 			if stderr.Len() > 0 && tc.stderr {
 				t.Errorf("unexpected stderr:\n%s", stderr.String())
@@ -266,7 +266,7 @@ func TestCLI_Version(t *testing.T) {
 	cmd.Dir = root
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol --version: %v", err)
+		t.Fatalf("molecule --version: %v", err)
 	}
 	out := stdout.String()
 	if !strings.Contains(out, "molecule") {
@@ -287,7 +287,7 @@ func TestCLI_WorkspaceList(t *testing.T) {
 	cmd.Dir = root
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol workspace list: %v\nstderr: %s", err, stderr.String())
+		t.Fatalf("molecule workspace list: %v\nstderr: %s", err, stderr.String())
 	}
 	out := stdout.String()
 	if !strings.Contains(out, "test-workspace") {
@@ -311,7 +311,7 @@ func TestCLI_WorkspaceList_JSON(t *testing.T) {
 	cmd.Dir = root
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol workspace list --output json: %v\nstderr: %s", err, stderr.String())
+		t.Fatalf("molecule workspace list --output json: %v\nstderr: %s", err, stderr.String())
 	}
 	var out []map[string]interface{}
 	if err := json.Unmarshal(stdout.Bytes(), &out); err != nil {
@@ -335,7 +335,7 @@ func TestCLI_WorkspaceInspect(t *testing.T) {
 	cmd.Dir = root
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol workspace inspect ws-001: %v\nstderr: %s", err, stderr.String())
+		t.Fatalf("molecule workspace inspect ws-001: %v\nstderr: %s", err, stderr.String())
 	}
 	out := stdout.String()
 	for _, want := range []string{"ws-001", "test-workspace", "online", "researcher"} {
@@ -382,7 +382,7 @@ func TestCLI_WorkspaceCreate(t *testing.T) {
 	cmd.Dir = root
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol workspace create: %v\nstderr: %s", err, stderr.String())
+		t.Fatalf("molecule workspace create: %v\nstderr: %s", err, stderr.String())
 	}
 	out := stdout.String()
 	if !strings.Contains(out, "my-workspace") {
@@ -427,7 +427,7 @@ func TestCLI_WorkspaceDelete(t *testing.T) {
 	cmd.Dir = root
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol workspace delete ws-001: %v\nstderr: %s", err, stderr.String())
+		t.Fatalf("molecule workspace delete ws-001: %v\nstderr: %s", err, stderr.String())
 	}
 	out := stdout.String()
 	if !strings.Contains(out, "deleted") {
@@ -448,7 +448,7 @@ func TestCLI_WorkspaceRestart(t *testing.T) {
 	cmd.Dir = root
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol workspace restart ws-001: %v\nstderr: %s", err, stderr.String())
+		t.Fatalf("molecule workspace restart ws-001: %v\nstderr: %s", err, stderr.String())
 	}
 	out := stdout.String()
 	if !strings.Contains(out, "Restart") {
@@ -469,7 +469,7 @@ func TestCLI_WorkspaceAudit(t *testing.T) {
 	cmd.Dir = root
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol workspace audit: %v\nstderr: %s", err, stderr.String())
+		t.Fatalf("molecule workspace audit: %v\nstderr: %s", err, stderr.String())
 	}
 	out := stdout.String()
 	for _, want := range []string{"test-workspace", "prod-workspace", "researcher-agent"} {
@@ -492,7 +492,7 @@ func TestCLI_WorkspaceDelegate(t *testing.T) {
 	cmd.Dir = root
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol workspace delegate: %v\nstderr: %s", err, stderr.String())
+		t.Fatalf("molecule workspace delegate: %v\nstderr: %s", err, stderr.String())
 	}
 	out := stdout.String()
 	if !strings.Contains(out, "Delegation") && !strings.Contains(out, "ws-002") {
@@ -513,7 +513,7 @@ func TestCLI_AgentList(t *testing.T) {
 	cmd.Dir = root
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol agent list: %v\nstderr: %s", err, stderr.String())
+		t.Fatalf("molecule agent list: %v\nstderr: %s", err, stderr.String())
 	}
 	out := stdout.String()
 	for _, want := range []string{"researcher-agent", "pm-agent"} {
@@ -536,7 +536,7 @@ func TestCLI_AgentList_WorkspaceFiltered(t *testing.T) {
 	cmd.Dir = root
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol agent list ws-001: %v\nstderr: %s", err, stderr.String())
+		t.Fatalf("molecule agent list ws-001: %v\nstderr: %s", err, stderr.String())
 	}
 	out := stdout.String()
 	if !strings.Contains(out, "researcher-agent") {
@@ -557,7 +557,7 @@ func TestCLI_AgentInspect(t *testing.T) {
 	cmd.Dir = root
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol agent inspect ag-001: %v\nstderr: %s", err, stderr.String())
+		t.Fatalf("molecule agent inspect ag-001: %v\nstderr: %s", err, stderr.String())
 	}
 	out := stdout.String()
 	for _, want := range []string{"ag-001", "researcher-agent", "online"} {
@@ -596,7 +596,7 @@ func TestCLI_AgentSend(t *testing.T) {
 	cmd.Dir = root
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol agent send: %v\nstderr: %s", err, stderr.String())
+		t.Fatalf("molecule agent send: %v\nstderr: %s", err, stderr.String())
 	}
 	out := stdout.String()
 	if !strings.Contains(out, "hello world") && !strings.Contains(out, "delivered") {
@@ -617,7 +617,7 @@ func TestCLI_AgentPeers(t *testing.T) {
 	cmd.Dir = root
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol agent peers ws-001: %v\nstderr: %s", err, stderr.String())
+		t.Fatalf("molecule agent peers ws-001: %v\nstderr: %s", err, stderr.String())
 	}
 	out := stdout.String()
 	if !strings.Contains(out, "prod-workspace") {
@@ -638,7 +638,7 @@ func TestCLI_PlatformHealth(t *testing.T) {
 	cmd.Dir = root
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol platform health: %v\nstderr: %s", err, stderr.String())
+		t.Fatalf("molecule platform health: %v\nstderr: %s", err, stderr.String())
 	}
 	out := stdout.String()
 	if !strings.Contains(out, "ok") && !strings.Contains(out, "1.2.3") {
@@ -659,7 +659,7 @@ func TestCLI_PlatformAudit(t *testing.T) {
 	cmd.Dir = root
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol platform audit: %v\nstderr: %s", err, stderr.String())
+		t.Fatalf("molecule platform audit: %v\nstderr: %s", err, stderr.String())
 	}
 	out := stdout.String()
 	if !strings.Contains(out, "test-workspace") || !strings.Contains(out, "prod-workspace") {
@@ -720,7 +720,7 @@ func TestCLI_ConfigInit(t *testing.T) {
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol config init: %v\nstderr: %s", err, stderr.String())
+		t.Fatalf("molecule config init: %v\nstderr: %s", err, stderr.String())
 	}
 	f := filepath.Join(dir, "molecule.yaml")
 	if _, err := os.Stat(f); err != nil {
@@ -741,12 +741,12 @@ func TestCLI_ConfigList(t *testing.T) {
 	cmd.Dir = root
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol config list: %v\nstderr: %s", err, stderr.String())
+		t.Fatalf("molecule config list: %v\nstderr: %s", err, stderr.String())
 	}
 	// Should at least show something without crashing
 	out := stdout.String()
 	if out == "" {
-		t.Errorf("empty stdout for mol config list")
+		t.Errorf("empty stdout for molecule config list")
 	}
 }
 
@@ -760,7 +760,7 @@ func TestCLI_Init(t *testing.T) {
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	if err != nil {
-		t.Fatalf("mol init: %v\nstderr: %s", err, stderr.String())
+		t.Fatalf("molecule init: %v\nstderr: %s", err, stderr.String())
 	}
 	f := filepath.Join(dir, "molecule.yaml")
 	if _, err := os.Stat(f); err != nil {
