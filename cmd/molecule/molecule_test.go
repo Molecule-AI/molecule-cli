@@ -203,11 +203,14 @@ func repoRoot() string {
 func mol(t *testing.T) string {
 	root := repoRoot()
 	exe := filepath.Join(t.TempDir(), "molecule")
-	cmd := exec.Command("go", "build", "-o", exe, "./cmd/molecule")
+	// Build from the module root (where go.mod lives).
+	// "go build ." packages the whole module; ./cmd/molecule is unnecessary
+	// and Go 1.25 may resolve it differently.
+	cmd := exec.Command("go", "build", "-o", exe, ".")
 	cmd.Dir = root
 	out, err := cmd.CombinedOutput()
 	if err != nil {
-		t.Fatalf("go build ./cmd/molecule: %v\n%s", err, out)
+		t.Fatalf("go build: %v\n%s", err, out)
 	}
 	return exe
 }
