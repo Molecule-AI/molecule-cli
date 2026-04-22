@@ -50,7 +50,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&outputFormat, "output", "o", "table",
 		"Output format: table | json | yaml")
 	rootCmd.PersistentFlags().StringVar(&configPath, "config", "",
-		"Path to config file (default ~/.config/mol.yaml or ./mol.yaml)")
+		"Path to config file (default ~/.config/molecule.yaml or ./molecule.yaml)")
 	rootCmd.SetFlagErrorFunc(func(cmd *cobra.Command, err error) error {
 		return &exitError{code: 2, msg: err.Error()}
 	})
@@ -63,7 +63,7 @@ func Execute() error {
 	if configPath != "" {
 		viper.SetConfigFile(configPath)
 	} else {
-		viper.SetConfigName("mol")
+		viper.SetConfigName("molecule")
 		viper.AddConfigPath("$HOME/.config")
 		viper.AddConfigPath(".")
 	}
@@ -123,5 +123,5 @@ func kv(w *tabwriter.Writer, k, v string) {
 }
 
 func versionInfo() string {
-	return fmt.Sprintf("mol %s (go %s)", Version, runtime.Version())
+	return fmt.Sprintf("molecule %s (go %s)", Version, runtime.Version())
 }

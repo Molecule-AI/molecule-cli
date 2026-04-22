@@ -202,7 +202,7 @@ func repoRoot() string {
 // mol returns the path to the CLI binary, building it if needed.
 func mol(t *testing.T) string {
 	root := repoRoot()
-	exe := filepath.Join(t.TempDir(), "mol")
+	exe := filepath.Join(t.TempDir(), "molecule")
 	goBin := runtime.GOEXE // e.g. "/usr/bin/go" — respects PATH
 	cmd := exec.Command(goBin, "build", "-o", exe, "./cmd/molecule")
 	cmd.Dir = root
@@ -269,8 +269,8 @@ func TestCLI_Version(t *testing.T) {
 		t.Fatalf("mol --version: %v", err)
 	}
 	out := stdout.String()
-	if !strings.Contains(out, "mol") {
-		t.Errorf("expected 'mol' in version output, got: %s", out)
+	if !strings.Contains(out, "molecule") {
+		t.Errorf("expected 'molecule' in version output, got: %s", out)
 	}
 }
 
@@ -722,9 +722,9 @@ func TestCLI_ConfigInit(t *testing.T) {
 	if err != nil {
 		t.Fatalf("mol config init: %v\nstderr: %s", err, stderr.String())
 	}
-	f := filepath.Join(dir, "mol.yaml")
+	f := filepath.Join(dir, "molecule.yaml")
 	if _, err := os.Stat(f); err != nil {
-		t.Errorf("mol.yaml not scaffolded at %s", f)
+		t.Errorf("molecule.yaml not scaffolded at %s", f)
 	}
 }
 
@@ -762,12 +762,12 @@ func TestCLI_Init(t *testing.T) {
 	if err != nil {
 		t.Fatalf("mol init: %v\nstderr: %s", err, stderr.String())
 	}
-	f := filepath.Join(dir, "mol.yaml")
+	f := filepath.Join(dir, "molecule.yaml")
 	if _, err := os.Stat(f); err != nil {
-		t.Errorf("mol.yaml not scaffolded at %s", f)
+		t.Errorf("molecule.yaml not scaffolded at %s", f)
 	}
 	out := stdout.String()
-	if !strings.Contains(out, "Scaffolded") && !strings.Contains(out, "mol.yaml") {
+	if !strings.Contains(out, "Scaffolded") && !strings.Contains(out, "molecule.yaml") {
 		t.Errorf("expected scaffolded confirmation in output, got:\n%s", out)
 	}
 }
@@ -775,21 +775,21 @@ func TestCLI_Init(t *testing.T) {
 func TestCLI_Init_AlreadyExists(t *testing.T) {
 	exe := mol(t)
 	dir := t.TempDir()
-	// pre-create mol.yaml
-	os.WriteFile(filepath.Join(dir, "mol.yaml"), []byte("x"), 0o644)
+	// pre-create molecule.yaml
+	os.WriteFile(filepath.Join(dir, "molecule.yaml"), []byte("x"), 0o644)
 	cmd := exec.Command(exe, "init")
 	cmd.Dir = dir
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
 	err := cmd.Run()
 	if err == nil {
-		t.Fatalf("expected error when mol.yaml exists, got none")
+		t.Fatalf("expected error when molecule.yaml exists, got none")
 	}
 	exitErr, ok := err.(*exec.ExitError)
 	if !ok {
 		t.Fatalf("expected *exec.ExitError, got %T", err)
 	}
 	if exitErr.ExitCode() == 0 {
-		t.Errorf("expected non-zero exit code when mol.yaml exists, got 0")
+		t.Errorf("expected non-zero exit code when molecule.yaml exists, got 0")
 	}
 }
