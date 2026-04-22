@@ -203,7 +203,8 @@ func repoRoot() string {
 func mol(t *testing.T) string {
 	root := repoRoot()
 	exe := filepath.Join(t.TempDir(), "mol")
-	cmd := exec.Command("/tmp/go/bin/go", "build", "-o", exe, "./cmd/molecule")
+	goBin := runtime.GOEXE // e.g. "/usr/bin/go" — respects PATH
+	cmd := exec.Command(goBin, "build", "-o", exe, "./cmd/molecule")
 	cmd.Dir = root
 	out, err := cmd.CombinedOutput()
 	if err != nil {

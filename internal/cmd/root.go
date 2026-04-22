@@ -25,18 +25,18 @@ var (
 
 // rootCmd is the top-level molecule command.
 var rootCmd = &cobra.Command{
-	Use:     "mol",
+	Use:     "molecule",
 	Version: Version,
-	Short:   "mol — Molecule AI platform CLI",
-	Long: `mol is the CLI for the Molecule AI agent platform.
+	Short:   "molecule — Molecule AI platform CLI",
+	Long: `molecule is the CLI for the Molecule AI agent platform.
 
 Manage workspaces, inspect agents, audit the platform, and configure
 agent behaviour from the terminal.
 
 Quick start:
-  mol workspace list
-  mol agent list
-  mol platform health`,
+  molecule workspace list
+  molecule agent list
+  molecule platform health`,
 	SilenceUsage:   true,
 	SilenceErrors:  true,
 }
