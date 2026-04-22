@@ -193,10 +193,13 @@ func mockServer(t *testing.T, basePath string) *httptest.Server {
 }
 
 // repoRoot returns the repo root directory.
+// Assumes this file is at cmd/molecule/molecule_test.go.
+// ../../.. from cmd/molecule/ -> the module root.
 func repoRoot() string {
-	// test file is at cmd/molecule/molecule_test.go
-	// ../.. from molecule/ goes to cmd, ../../.. goes to clone-cli
-	return filepath.Dir(filepath.Dir(filepath.Dir("/workspace/repos/clone-cli/cmd/molecule/")))
+	// Use os.Args[0] as a stable anchor: the test binary path.
+	// We walk up 3 levels from the test binary location.
+	exe, _ := os.Executable()
+	return filepath.Join(filepath.Dir(exe), "..", "..", "..")
 }
 
 // mol returns the path to the CLI binary, building it if needed.
