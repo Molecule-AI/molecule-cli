@@ -8,7 +8,6 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"runtime"
 	"strings"
 	"testing"
 )
@@ -207,8 +206,7 @@ func repoRoot() string {
 func mol(t *testing.T) string {
 	root := repoRoot()
 	exe := filepath.Join(t.TempDir(), "molecule")
-	goBin := runtime.GOEXE // e.g. "/usr/bin/go" — respects PATH
-	cmd := exec.Command(goBin, "build", "-o", exe, "./cmd/molecule")
+	cmd := exec.Command("go", "build", "-o", exe, "./cmd/molecule")
 	cmd.Dir = root
 	out, err := cmd.CombinedOutput()
 	if err != nil {
