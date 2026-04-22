@@ -793,3 +793,71 @@ func TestCLI_Init_AlreadyExists(t *testing.T) {
 		t.Errorf("expected non-zero exit code when molecule.yaml exists, got 0")
 	}
 }
+
+func TestCLI_Completion_Help(t *testing.T) {
+	exe := mol(t)
+	root := repoRoot()
+	for _, shell := range []string{"bash", "zsh", "fish", "powershell"} {
+		t.Run(shell+"-help", func(t *testing.T) {
+			cmd := exec.Command(exe, "completion", shell, "--help")
+			var stdout, stderr bytes.Buffer
+			cmd.Stdout = &stdout
+			cmd.Stderr = &stderr
+			cmd.Dir = root
+			err := cmd.Run()
+			if err != nil {
+				t.Fatalf("molecule completion %s --help: %v\nstderr: %s", shell, err, stderr.String())
+			}
+			out := stdout.String()
+			if out == "" {
+				t.Errorf("empty stdout for molecule completion %s --help", shell)
+			}
+		})
+	}
+}
+
+func TestCLI_Completion_GeneratesScript(t *testing.T) {
+	exe := mol(t)
+	root := repoRoot()
+	for _, shell := range []string{"bash", "zsh", "fish", "powershell"} {
+		t.Run(shell, func(t *testing.T) {
+			cmd := exec.Command(exe, "completion", shell)
+			var stdout, stderr bytes.Buffer
+			cmd.Stdout = &stdout
+			cmd.Stderr = &stderr
+			cmd.Dir = root
+			err := cmd.Run()
+			if err != nil {
+				t.Fatalf("molecule completion %s: %v\nstderr: %s", shell, err, stderr.String())
+			}
+			out := stdout.String()
+			if out == "" {
+				t.Errorf("empty completion script for %s", shell)
+			}
+			// The script should mention molecule or contain a directive/completion call
+			if !strings.Contains(out, "molecule") && !strings.Contains(out, "_molecule") {
+				t.Errorf("completion script for %s does not mention molecule:\n%s", shell, out)
+			}
+		})
+	}
+}
+
+func TestCLI_Completion_InvalidShell(t *testing.T) {
+	exe := mol(t)
+	root := repoRoot()
+	cmd := exec.Command(exe, "completion", "unsupported-shell")
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	cmd.Dir = root
+	err := cmd.Run()
+	if err == nil {
+		t.Fatalf("expected error for unsupported shell, got none")
+	}
+	exitErr, ok := err.(*exec.ExitError)
+	if !ok {
+		t.Fatalf("expected *exec.ExitError, got %T", err)
+	}
+	if exitErr.ExitCode() == 0 {
+		t.Errorf("expected non-zero exit code for unsupported shell, got 0")
+	}
+}
