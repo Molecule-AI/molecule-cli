@@ -796,6 +796,47 @@ func TestCLI_Init_AlreadyExists(t *testing.T) {
 	}
 }
 
+func TestCLI_Init_Force(t *testing.T) {
+	exe := mol(t)
+	dir := t.TempDir()
+	// pre-create molecule.yaml
+	existing := "# old config"
+	os.WriteFile(filepath.Join(dir, "molecule.yaml"), []byte(existing), 0o644)
+	cmd := exec.Command(exe, "init", "--force")
+	cmd.Dir = dir
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if err != nil {
+		t.Fatalf("molecule init --force: %v\nstderr: %s", err, stderr.String())
+	}
+	out := stdout.String()
+	if !strings.Contains(out, "Replaced") {
+		t.Errorf("expected 'Replaced' in output, got: %s", out)
+	}
+}
+
+func TestCLI_Init_Force_Overwrites(t *testing.T) {
+	exe := mol(t)
+	dir := t.TempDir()
+	// pre-create molecule.yaml
+	os.WriteFile(filepath.Join(dir, "molecule.yaml"), []byte("old content"), 0o644)
+	cmd := exec.Command(exe, "init", "--force")
+	cmd.Dir = dir
+	err := cmd.Run()
+	if err != nil {
+		t.Fatalf("molecule init --force: %v", err)
+	}
+	data, _ := os.ReadFile(filepath.Join(dir, "molecule.yaml"))
+	if strings.Contains(string(data), "old content") {
+		t.Errorf("molecule.yaml was not overwritten")
+	}
+	if !strings.Contains(string(data), "molecule CLI") {
+		t.Errorf("molecule.yaml should have new scaffold content")
+	}
+}
+
 func TestCLI_Completion_Help(t *testing.T) {
 	exe := mol(t)
 	root := repoRoot()
