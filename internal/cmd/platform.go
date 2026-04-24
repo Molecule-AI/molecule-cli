@@ -54,6 +54,10 @@ func runPlatformAudit(cmd *cobra.Command, _ []string) error {
 		ID, Name, Status, Role string
 		AgentCount, DelegationCount int
 	}
+	byStatus := map[string]int{}
+	for _, ws := range workspaces {
+		byStatus[ws.Status]++
+	}
 	rows := make([]wsRow, 0, len(workspaces))
 	for _, ws := range workspaces {
 		ac := 0
@@ -68,27 +72,28 @@ func runPlatformAudit(cmd *cobra.Command, _ []string) error {
 		})
 	}
 
-	if outputFormat == "json" || outputFormat == "yaml" {
-		type audit struct {
-			WorkspaceCount int               `json:"workspace_count"`
-			AgentCount     int               `json:"agent_count"`
-			ByStatus       map[string]int   `json:"by_status"`
-			DelegationMap  map[string]int  `json:"delegations_by_workspace"`
-			Rows           []wsRow          `json:"workspaces"`
-			Agents         []client.Agent   `json:"agents"`
-		}
-		byStatus := map[string]int{}
-		for _, ws := range workspaces {
-			byStatus[ws.Status]++
-		}
-		return printJSON(audit{
-			WorkspaceCount: len(workspaces),
-			AgentCount:     len(agents),
-			ByStatus:       byStatus,
-			DelegationMap:  delegationsByWS,
-			Rows:           rows,
-			Agents:         agents,
-		})
+	type audit struct {
+		WorkspaceCount int               `json:"workspace_count"`
+		AgentCount     int               `json:"agent_count"`
+		ByStatus       map[string]int    `json:"by_status"`
+		DelegationMap  map[string]int    `json:"delegations_by_workspace"`
+		Rows           []wsRow           `json:"workspaces"`
+		Agents         []client.Agent   `json:"agents"`
+	}
+	auditReport := audit{
+		WorkspaceCount: len(workspaces),
+		AgentCount:     len(agents),
+		ByStatus:       byStatus,
+		DelegationMap:  delegationsByWS,
+		Rows:           rows,
+		Agents:         agents,
+	}
+
+	if outputFormat == "json" {
+		return printJSON(auditReport)
+	}
+	if outputFormat == "yaml" {
+		return printYAML(auditReport)
 	}
 
 	w := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
@@ -123,8 +128,12 @@ func runPlatformHealth(cmd *cobra.Command, _ []string) error {
 		fmt.Printf("Platform reachable at %s — raw status: %s\n", cl.BaseURL, string(body))
 		return nil
 	}
-	if outputFormat == "json" || outputFormat == "yaml" {
+	if outputFormat == "json" {
 		return printJSON(h)
+	}
+	if outputFormat == "yaml" {
+		return printYAML(h)
+	}
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
 	kv(w, "Status", h.Status)

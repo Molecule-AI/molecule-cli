@@ -49,8 +49,11 @@ func runAgentList(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("agent list: %w", err)
 	}
-	if outputFormat == "json" || outputFormat == "yaml" {
+	if outputFormat == "json" {
 		return printJSON(agents)
+	}
+	if outputFormat == "yaml" {
+		return printYAML(agents)
 	}
 	if len(agents) == 0 {
 		fmt.Println("No agents found.")
@@ -81,8 +84,11 @@ func runAgentInspect(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("agent inspect: %w", err)
 	}
-	if outputFormat == "json" || outputFormat == "yaml" {
+	if outputFormat == "json" {
 		return printJSON(a)
+	}
+	if outputFormat == "yaml" {
+		return printYAML(a)
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
 	kv(w, "ID", a.ID)
@@ -158,8 +164,11 @@ func runAgentPeers(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("agent peers: %w", err)
 	}
-	if outputFormat == "json" || outputFormat == "yaml" {
+	if outputFormat == "json" {
 		return printJSON(peers)
+	}
+	if outputFormat == "yaml" {
+		return printYAML(peers)
 	}
 	if len(peers) == 0 {
 		fmt.Println("No peers found.")
