@@ -134,7 +134,6 @@ func runPlatformHealth(cmd *cobra.Command, _ []string) error {
 	if outputFormat == "yaml" {
 		return printYAML(h)
 	}
-	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
 	kv(w, "Status", h.Status)
 	kv(w, "Version", h.Version)
