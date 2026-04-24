@@ -43,8 +43,11 @@ func runWorkspaceList(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return fmt.Errorf("workspace list: %w", err)
 	}
-	if outputFormat == "json" || outputFormat == "yaml" {
+	if outputFormat == "json" {
 		return printJSON(ws)
+	}
+	if outputFormat == "yaml" {
+		return printYAML(ws)
 	}
 	if len(ws) == 0 {
 		fmt.Println("No workspaces found.")
@@ -115,8 +118,11 @@ func runWorkspaceCreate(cmd *cobra.Command, _ []string) error {
 	if err != nil {
 		return fmt.Errorf("workspace create: %w", err)
 	}
-	if outputFormat == "json" || outputFormat == "yaml" {
+	if outputFormat == "json" {
 		return printJSON(ws)
+	}
+	if outputFormat == "yaml" {
+		return printYAML(ws)
 	}
 	fmt.Printf("Workspace created: %s (%s)\n", ws.Name, ws.ID)
 	return nil
@@ -138,8 +144,11 @@ func runWorkspaceInspect(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("workspace inspect: %w", err)
 	}
-	if outputFormat == "json" || outputFormat == "yaml" {
+	if outputFormat == "json" {
 		return printJSON(ws)
+	}
+	if outputFormat == "yaml" {
+		return printYAML(ws)
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
 	kv(w, "ID", ws.ID)
@@ -228,8 +237,11 @@ func runWorkspaceAudit(cmd *cobra.Command, _ []string) error {
 		Items:      workspaces,
 		AgentList:  agents,
 	}
-	if outputFormat == "json" || outputFormat == "yaml" {
+	if outputFormat == "json" {
 		return printJSON(report)
+	}
+	if outputFormat == "yaml" {
+		return printYAML(report)
 	}
 	w := tabwriter.NewWriter(os.Stdout, 0, 4, 2, ' ', 0)
 	fmt.Fprintln(w, "WORKSPACES\t")

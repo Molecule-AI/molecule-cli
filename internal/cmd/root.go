@@ -10,6 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"gopkg.in/yaml.v3"
 )
 
 // Version is set at build time via -ldflags.
@@ -112,6 +113,13 @@ func handleErr(err error) error {
 // printJSON writes v as JSON to stdout.
 func printJSON(v interface{}) error {
 	return json.NewEncoder(os.Stdout).Encode(v)
+}
+
+// printYAML writes v as YAML to stdout.
+func printYAML(v interface{}) error {
+	enc := yaml.NewEncoder(os.Stdout)
+	enc.SetIndent(2)
+	return enc.Encode(v)
 }
 
 // kv writes a key-value pair to the tabwriter (only if v is non-empty).
