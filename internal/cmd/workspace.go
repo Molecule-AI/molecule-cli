@@ -284,5 +284,6 @@ func runWorkspaceDelegate(cmd *cobra.Command, args []string) error {
 	} else {
 		fmt.Printf("Delegation sent to %q.\n", targetID)
 	}
+	_ = workspaceID
 	return nil
 }
