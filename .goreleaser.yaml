@@ -1,16 +1,14 @@
 # GoReleaser configuration for molecule-cli
 # https://goreleaser.com/install/
 #
-# .goreleaser.yaml is the main config file for GoReleaser.
-# This file must be committed. GoReleaser reads it from the repo root.
+# Used by .github/workflows/release.yml on tag push (refs/tags/v*).
+# Produces multi-OS binaries (linux/darwin/windows × amd64/arm64),
+# tar.gz/zip archives that include pre-generated shell completions,
+# a sha256 checksums file, and a GitHub Release.
 #
 # Run locally:
-#   goreleaser check    # validate the config
-#   goreleaser snapshot --clean --snapshot-dir ./.snapshot  # dry-run build
-#
-# CI: GitHub Actions runs plain `go build` per target (see .github/workflows/release.yml).
-# GoReleaser would be used for a more sophisticated release (changelog from commits,
-# multiple formats, Homebrew formula update, checksum files). Wire it up here when ready.
+#   goreleaser check    — validate the config
+#   goreleaser release --snapshot --clean    — dry-run build (no upload)
 
 version: 2
 
@@ -20,6 +18,13 @@ env:
 before:
   hooks:
     - go mod tidy
+    # Pre-generate shell completions so the archive ships them. Users
+    # can drop completions/molecule.bash into ~/.bash_completion.d/, etc.
+    # `molecule completion <shell>` also still works at runtime.
+    - mkdir -p completions
+    - sh -c 'go run ./cmd/molecule completion bash > completions/molecule.bash'
+    - sh -c 'go run ./cmd/molecule completion zsh > completions/_molecule'
+    - sh -c 'go run ./cmd/molecule completion fish > completions/molecule.fish'
 
 builds:
   - id: molecule
@@ -40,15 +45,13 @@ builds:
 
 archives:
   - id: default
-    format: tar.gz
+    formats: [tar.gz]
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [zip]
     files:
       - src: completions/**/*
         dst: completions
-    checksum:
-      name_template: 'molecule_{{.Os}}_{{.Arch}}_{{.Version}}_checksums.txt'
 
 snapshot:
   name_template: "{{.Tag}}-snapshot"
