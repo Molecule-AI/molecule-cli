@@ -89,6 +89,7 @@ func init() {
 	rootCmd.AddCommand(platformCmd)
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(initCmd)
+	rootCmd.AddCommand(connectCmd)
 }
 
 // exitError wraps a user-facing error with a specific exit code.
