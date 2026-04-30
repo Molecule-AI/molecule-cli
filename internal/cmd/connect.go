@@ -7,9 +7,11 @@ import (
 	"os/signal"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/Molecule-AI/molecule-cli/internal/backends"
 	_ "github.com/Molecule-AI/molecule-cli/internal/backends/mock" // register backend
+	"github.com/Molecule-AI/molecule-cli/internal/connect"
 	"github.com/spf13/cobra"
 )
 
@@ -118,16 +120,30 @@ func runConnect(_ *cobra.Command, args []string) error {
 		return backend.Close()
 	}
 
-	// Loops (heartbeat + activity poll + dispatch) land in internal/connect
-	// in PR M1.2. For M1.1 we wire signal handling so the command exits
-	// cleanly when invoked in --dry-run by tests, and so future loops
-	// inherit context cancellation.
+	// Push mode is the M4 work — for M1+ poll-mode is the supported path.
+	// Surface a clear error so users with --mode push see why they're
+	// blocked instead of getting confusing "Not Found" responses.
+	if connectFlags.mode == "push" {
+		return &exitError{code: 2,
+			msg: "connect: push mode is not yet implemented (M4); use --mode poll"}
+	}
+
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer cancel()
 
-	<-ctx.Done()
-	fmt.Fprintln(os.Stderr, "molecule connect: shutting down")
-	return backend.Close()
+	err = connect.Run(ctx, connect.Options{
+		APIURL:         apiURL,
+		WorkspaceID:    workspaceID,
+		Token:          connectFlags.token,
+		Backend:        backend,
+		PollEvery:      time.Duration(connectFlags.intervalMs) * time.Millisecond,
+		HeartbeatEvery: 30 * time.Second,
+	})
+	closeErr := backend.Close()
+	if err != nil && err != context.Canceled {
+		return err
+	}
+	return closeErr
 }
 
 // parseBackendOpts converts repeated KEY=VALUE flags into a Config map.
