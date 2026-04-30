@@ -10,7 +10,9 @@ import (
 	"time"
 
 	"github.com/Molecule-AI/molecule-cli/internal/backends"
-	_ "github.com/Molecule-AI/molecule-cli/internal/backends/mock" // register backend
+	_ "github.com/Molecule-AI/molecule-cli/internal/backends/claudecode" // register backend
+	_ "github.com/Molecule-AI/molecule-cli/internal/backends/exec"       // register backend
+	_ "github.com/Molecule-AI/molecule-cli/internal/backends/mock"       // register backend
 	"github.com/Molecule-AI/molecule-cli/internal/connect"
 	"github.com/spf13/cobra"
 )
