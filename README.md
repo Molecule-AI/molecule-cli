@@ -59,7 +59,7 @@ molecule connect ws_abc \
 ### Other useful flags
 
 ```
---mode poll|push         delivery mode (default: poll)
+--mode poll|push         delivery mode (default: poll; push is M4, not yet implemented)
 --interval-ms 2000       poll cadence
 --since-secs 60          initial activity cursor lookback
 --token TOKEN            override MOLECULE_WORKSPACE_TOKEN
@@ -70,12 +70,156 @@ State (the activity cursor) is persisted to
 `~/.config/molecule/state/<workspace-id>.json` (mode 0600) so a restart
 resumes from the last delivered message.
 
-## Other subcommands
+> Note: poll-mode dispatch into backends works end-to-end. Posting the
+> backend's reply back to the canvas-origin sender is still wired as a
+> TODO (see `internal/connect/connect.go` — M1.3); platform-API replies
+> for non-canvas A2A flow correctly.
+
+## Command reference
+
+The full top-level tree:
 
 ```
-molecule agent      list / inspect agent sessions
-molecule config     view / set CLI defaults
-molecule completion generate shell completions
+molecule
+├── workspace    list / create / inspect / delete / restart / audit / delegate
+├── agent        list / inspect / send / peers
+├── platform     audit / health
+├── config       list / get / set / init / view
+├── connect      bridge an external workspace to a local backend
+├── init         scaffold a molecule.yaml in the current directory
+└── completion   emit shell completion script (bash | zsh | fish | powershell)
+```
+
+Global flags (apply to every subcommand): `--api-url`, `--config`,
+`-o/--output table|json|yaml`, `-v/--verbose`.
+
+### `molecule workspace`
+
+Manage Molecule AI workspaces.
+
+- **`workspace list`** — list all workspaces in the org.
+  ```bash
+  molecule workspace list
+  molecule workspace list -o json
+  ```
+- **`workspace create --name <name> [flags]`** — create a workspace.
+  Flags: `--role`, `--runtime`, `--template`, `--parent-id`,
+  `--workspace-dir`, `--tier`.
+  ```bash
+  molecule workspace create --name pm-bot --role pm --runtime claude-code
+  ```
+- **`workspace inspect <workspace-id>`** — show full details for a workspace.
+  ```bash
+  molecule workspace inspect ws_01HF2K...
+  ```
+- **`workspace delete <workspace-id>`** — delete a workspace (irreversible).
+  ```bash
+  molecule workspace delete ws_01HF2K...
+  ```
+- **`workspace restart <workspace-id>`** — trigger a restart.
+  ```bash
+  molecule workspace restart ws_01HF2K...
+  ```
+- **`workspace audit`** — workspaces + agents report grouped by status.
+  ```bash
+  molecule workspace audit -o yaml
+  ```
+- **`workspace delegate <workspace-id> <target-workspace-id> <task>`** —
+  enqueue a non-blocking delegation from one workspace to another.
+  ```bash
+  molecule workspace delegate ws_pm ws_research "summarize last week"
+  ```
+
+### `molecule agent`
+
+Inspect and interact with agents.
+
+- **`agent list [workspace-id]`** — list all agents, optionally scoped
+  to one workspace.
+  ```bash
+  molecule agent list
+  molecule agent list ws_01HF2K...
+  ```
+- **`agent inspect <agent-id>`** — show full details for an agent.
+  ```bash
+  molecule agent inspect agent_abc
+  ```
+- **`agent send <agent-id> <message>`** — send a one-shot A2A message
+  to an agent and print the reply.
+  ```bash
+  molecule agent send agent_abc "what's the deploy status?"
+  ```
+- **`agent peers <workspace-id>`** — list peer workspaces reachable
+  from the given workspace.
+  ```bash
+  molecule agent peers ws_01HF2K...
+  ```
+
+### `molecule platform`
+
+Platform-level operations.
+
+- **`platform audit`** — full audit: workspaces, agents, delegation
+  counts per workspace.
+  ```bash
+  molecule platform audit -o json
+  ```
+- **`platform health`** — check `/health` and version (falls back to
+  raw probe on older platforms).
+  ```bash
+  molecule platform health
+  ```
+
+### `molecule config`
+
+View and manage CLI configuration. Values resolve in order: env vars >
+config file > defaults.
+
+- **`config list`** — list all known config keys + effective values + source.
+- **`config get <key>`** — print a single config value.
+- **`config set <key> <value>`** — write a key to `~/.config/molecule.yaml`.
+- **`config init`** — scaffold a default `molecule.yaml` in the current dir.
+- **`config view`** — print the active config file with annotations.
+
+```bash
+molecule config set api_url https://your-tenant.staging.moleculesai.app
+molecule config get api_url
+molecule config list
+```
+
+### `molecule connect`
+
+See [Quick start](#quick-start--connect-an-external-workspace) above.
+Push mode (`--mode push`) is reserved for M4 and currently exits with a
+clear error — use the default `--mode poll`.
+
+### `molecule init`
+
+Bootstrap a workspace by scaffolding `molecule.yaml` in the current
+directory. Use `--force` to replace an existing file.
+
+```bash
+molecule init
+molecule init --force
+```
+
+### `molecule completion`
+
+Emit a shell completion script. The shell name is a positional arg —
+one of `bash`, `zsh`, `fish`, `powershell`.
+
+```bash
+# bash
+source <(molecule completion bash)
+
+# zsh
+source <(molecule completion zsh)
+
+# fish
+molecule completion fish | source
+
+# PowerShell
+molecule completion powershell | Out-String | Invoke-Expression
 ```
 
 The full M1 design is in [RFC #10](https://github.com/Molecule-AI/molecule-cli/issues/10).
