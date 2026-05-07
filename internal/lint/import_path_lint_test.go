@@ -63,6 +63,7 @@ func TestNoLegacyGitHubImportPaths(t *testing.T) {
 		".yaml": true,
 		".toml": true,
 		".md":   true,
+	".json": true, // package.json / tsconfig.json — catches ref drift in package metadata
 	}
 	checkBasename := map[string]bool{
 		"Dockerfile":        true,
