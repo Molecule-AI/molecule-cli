@@ -5,7 +5,7 @@
 // that registers itself via `Register()` from an `init()` block.
 // Runtime selection is done via the --backend flag.
 //
-// See RFC: https://github.com/Molecule-AI/molecule-cli/issues/10
+// See RFC: https://git.moleculesai.app/molecule-ai/molecule-cli/issues/10
 package backends
 
 import (

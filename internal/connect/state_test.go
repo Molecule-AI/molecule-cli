@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Molecule-AI/molecule-cli/internal/connect"
+	"go.moleculesai.app/cli/internal/connect"
 )
 
 func TestState_LoadMissingReturnsZero(t *testing.T) {

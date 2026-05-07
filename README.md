@@ -7,31 +7,24 @@ command, or a mock for CI).
 
 ## Install
 
-> **Migration in progress** (2026-05-07): the `github.com/Molecule-AI`
-> org was suspended on 2026-05-06 and is permanently gone. The
-> canonical SCM is now Gitea at
-> [`git.moleculesai.app/molecule-ai`](https://git.moleculesai.app/molecule-ai).
->
-> The `go install` path below requires the Go module-path migration to
-> land first (separate cross-repo PR — see `internal#37` parked
-> follow-up). Until then, build from source:
->
-> ```bash
-> git clone https://git.moleculesai.app/molecule-ai/molecule-cli.git
-> cd molecule-cli
-> go build -o molecule ./cmd/molecule
-> ```
->
-> Once the Go module-path migration lands:
-
 ```bash
-go install git.moleculesai.app/molecule-ai/molecule-cli/cmd/molecule@latest
+go install go.moleculesai.app/cli/cmd/molecule@latest
 ```
 
-Releases ship Linux/macOS/Windows × amd64/arm64 archives plus a sha256
-checksums file (see `.goreleaser.yaml`). Releases pipeline (Gitea
-Actions) is being restored as part of the post-suspension recovery; in
-the interim, build from source per the migration note above.
+The vanity import path `go.moleculesai.app/cli` resolves via the
+Molecules AI go-get responder (issue [internal#71][i71]) to our
+canonical SCM at git.moleculesai.app. It is independent of any specific
+SCM host — when we move SCMs again, no install command changes.
+
+Alternatively, build from source:
+
+```bash
+git clone https://git.moleculesai.app/molecule-ai/molecule-cli.git
+cd molecule-cli
+go build -o molecule ./cmd/molecule
+```
+
+[i71]: https://git.moleculesai.app/molecule-ai/internal/issues/71
 
 ## Quick start — connect an external workspace
 

@@ -93,7 +93,7 @@ entries may cause CI divergence or checksum mismatches.
 
 ### Impact
 `go mod verify` in CI may fail if `go.sum` has extra entries not in the
- lock file. Additionally, if the module path (`github.com/Molecule-AI/molecule-cli`)
+ lock file. Additionally, if the module path (`go.moleculesai.app/cli`)
  is referenced via `replace` directives from other repos, those references may
 persist stale entries.
 

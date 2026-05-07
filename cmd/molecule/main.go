@@ -6,7 +6,7 @@ package main
 import (
 	"os"
 
-	"github.com/Molecule-AI/molecule-cli/internal/cmd"
+	"go.moleculesai.app/cli/internal/cmd"
 )
 
 func main() {

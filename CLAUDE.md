@@ -34,7 +34,7 @@ There is no `main.go` or `cmd/molecule/main.go` yet. Creating it is the first im
 
 ## 3. Go Module Conventions
 
-**Module path:** `github.com/Molecule-AI/molecule-cli` (from `go.mod`)
+**Module path:** `go.moleculesai.app/cli` (from `go.mod`)
 
 **Dependency management:**
 - Use `go mod tidy` after adding or removing dependencies.

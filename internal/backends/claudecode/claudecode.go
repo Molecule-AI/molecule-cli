@@ -29,8 +29,8 @@ package claudecode
 import (
 	"strings"
 
-	"github.com/Molecule-AI/molecule-cli/internal/backends"
-	exec "github.com/Molecule-AI/molecule-cli/internal/backends/exec"
+	"go.moleculesai.app/cli/internal/backends"
+	exec "go.moleculesai.app/cli/internal/backends/exec"
 )
 
 func init() {
