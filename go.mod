@@ -1,4 +1,4 @@
-module github.com/Molecule-AI/molecule-cli
+module go.moleculesai.app/cli
 
 go 1.25.0
 

@@ -121,7 +121,7 @@ var configInitCmd = &cobra.Command{
 }
 
 func runConfigInit(cmd *cobra.Command, _ []string) error {
-	const defaultConfig = `# molecule CLI config — https://github.com/Molecule-AI/molecule-cli
+	const defaultConfig = `# molecule CLI config — https://git.moleculesai.app/molecule-ai/molecule-cli
 #
 # All values can be overridden by environment variables:
 #   MOLECULE_API_URL, MOLECULE_RUNTIME_URL, MOL_OUTPUT, MOL_VERBOSE, etc.

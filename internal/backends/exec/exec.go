@@ -41,7 +41,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Molecule-AI/molecule-cli/internal/backends"
+	"go.moleculesai.app/cli/internal/backends"
 )
 
 func init() {

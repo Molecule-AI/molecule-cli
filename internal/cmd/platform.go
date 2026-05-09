@@ -8,7 +8,7 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/Molecule-AI/molecule-cli/internal/client"
+	"go.moleculesai.app/cli/internal/client"
 	"github.com/spf13/cobra"
 )
 

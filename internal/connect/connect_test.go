@@ -13,9 +13,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Molecule-AI/molecule-cli/internal/backends"
-	_ "github.com/Molecule-AI/molecule-cli/internal/backends/mock" // register mock for tests
-	"github.com/Molecule-AI/molecule-cli/internal/connect"
+	"go.moleculesai.app/cli/internal/backends"
+	_ "go.moleculesai.app/cli/internal/backends/mock" // register mock for tests
+	"go.moleculesai.app/cli/internal/connect"
 )
 
 // fakeServer is the minimum workspace-server stub the loops need:

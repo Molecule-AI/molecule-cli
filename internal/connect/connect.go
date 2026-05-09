@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Molecule-AI/molecule-cli/internal/backends"
+	"go.moleculesai.app/cli/internal/backends"
 )
 
 // Options carries the runtime knobs Run needs. Constructed by the cmd

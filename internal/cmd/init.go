@@ -40,7 +40,7 @@ func runInit(cmd *cobra.Command, _ []string) error {
 
 	if _, err := os.Stat(cfgPath); err == nil {
 		if initForce {
-			content := `# molecule CLI configuration — https://github.com/Molecule-AI/molecule-cli
+			content := `# molecule CLI configuration — https://git.moleculesai.app/molecule-ai/molecule-cli
 #
 # All values can be overridden by environment variables:
 #   MOLECULE_API_URL, MOLECULE_RUNTIME_URL, MOL_OUTPUT, MOL_VERBOSE, etc.
@@ -69,7 +69,7 @@ func runInit(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("init: %s already exists — not overwriting (use --force to replace)", cfgPath)
 	}
 
-	content := `# molecule CLI configuration — https://github.com/Molecule-AI/molecule-cli
+	content := `# molecule CLI configuration — https://git.moleculesai.app/molecule-ai/molecule-cli
 #
 # All values can be overridden by environment variables:
 #   MOLECULE_API_URL, MOLECULE_RUNTIME_URL, MOL_OUTPUT, MOL_VERBOSE, etc.

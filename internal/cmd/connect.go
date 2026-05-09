@@ -9,11 +9,11 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Molecule-AI/molecule-cli/internal/backends"
-	_ "github.com/Molecule-AI/molecule-cli/internal/backends/claudecode" // register backend
-	_ "github.com/Molecule-AI/molecule-cli/internal/backends/exec"       // register backend
-	_ "github.com/Molecule-AI/molecule-cli/internal/backends/mock"       // register backend
-	"github.com/Molecule-AI/molecule-cli/internal/connect"
+	"go.moleculesai.app/cli/internal/backends"
+	_ "go.moleculesai.app/cli/internal/backends/claudecode" // register backend
+	_ "go.moleculesai.app/cli/internal/backends/exec"       // register backend
+	_ "go.moleculesai.app/cli/internal/backends/mock"       // register backend
+	"go.moleculesai.app/cli/internal/connect"
 	"github.com/spf13/cobra"
 )
 
@@ -21,7 +21,7 @@ import (
 // molecule connect — bridge an external-runtime workspace to a local backend.
 //
 // The full M1+ design lives in the RFC at
-// https://github.com/Molecule-AI/molecule-cli/issues/10. This file owns the
+// https://git.moleculesai.app/molecule-ai/molecule-cli/issues/10. This file owns the
 // command surface; the wiring (heartbeat, activity poll, dispatch) lands in
 // internal/connect/ in subsequent PRs.
 // ---------------------------------------------------------------------------
@@ -68,7 +68,7 @@ Examples:
   molecule connect ws_01HF2K... --backend exec \
       --backend-opt cmd="python myhandler.py"
 
-See full design: https://github.com/Molecule-AI/molecule-cli/issues/10`,
+See full design: https://git.moleculesai.app/molecule-ai/molecule-cli/issues/10`,
 	Args: cobra.ExactArgs(1),
 	RunE: runConnect,
 }

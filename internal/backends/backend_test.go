@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Molecule-AI/molecule-cli/internal/backends"
-	_ "github.com/Molecule-AI/molecule-cli/internal/backends/mock" // register
+	"go.moleculesai.app/cli/internal/backends"
+	_ "go.moleculesai.app/cli/internal/backends/mock" // register
 )
 
 func TestRegister_DuplicatePanics(t *testing.T) {

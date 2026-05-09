@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Molecule-AI/molecule-cli/internal/backends"
-	_ "github.com/Molecule-AI/molecule-cli/internal/backends/exec" // register
+	"go.moleculesai.app/cli/internal/backends"
+	_ "go.moleculesai.app/cli/internal/backends/exec" // register
 )
 
 // requireUnix skips Windows tests that depend on /bin/sh shell semantics.
