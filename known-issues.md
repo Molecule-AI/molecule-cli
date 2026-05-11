@@ -130,24 +130,29 @@ is set to `.` (repo root) since the main package is at `cmd/molecule`.
 
 ## KI-005 — No integration test for the full CLI lifecycle
 
-**File:** `tests/` (does not exist)  
-**Status:** Not yet implemented  
+**File:** `cmd/molecule/molecule_test.go`, `internal/`  
+**Status:** ✅ Resolved  
 **Severity:** Medium
 
-### Symptom
-There are no tests at all (per `go test ./...` — no packages match).
-As subcommands are built, there is no test harness for end-to-end CLI testing
-(e.g. `molecule workspace create --name test --output json` → verify JSON output).
+### Resolution
+`cmd/molecule/molecule_test.go` contains 32 table-driven integration tests
+covering the full CLI command surface. Each test:
+- Starts a `httptest.Server` that mirrors the platform REST API (workspace CRUD,
+  agent inspection, delegation, health, audit, config, completion scripts).
+- Builds the `molecule` binary via `go build -o <tempdir>/molecule .`
+- Executes it with `exec.Command` and validates stdout/stderr output.
 
-### Impact
-Each subcommand will be shipped without regression protection. Manual testing
-is required for every release. The absence of a `tests/` directory also means
-there is no fixture for CLI integration testing with recorded API responses.
+Test coverage includes:
+- Root help, workspace/agent/platform/config help
+- `workspace list`, `workspace inspect`, `workspace create`, `workspace delete`,
+  `workspace restart`, `workspace audit`, `workspace delegate`
+- `agent list`, `agent inspect`, `agent send`, `agent peers`
+- `platform health`, `platform audit`
+- `config init`, `config list`
+- `init`, `init --force`
+- `completion bash/zsh/fish/powershell`
+- Error paths: missing workspace, missing agent, unknown subcommand,
+  missing required args, duplicate init
 
-### Suggested fix
-Add `tests/` with:
-- `cmd/molecule/molecule_test.go` — table-driven tests for each subcommand
-  using `exec.Command("molecule", ...)` against a built binary
-- Use `molecule-sdk-python` fixture server or recorded API responses for
-  offline testing
-- Add `go test ./...` to CI; require >0 test packages before merge
+Run `go test ./...` from the repo root to execute. No live platform required —
+all tests use `httptest.Server` fixtures.
