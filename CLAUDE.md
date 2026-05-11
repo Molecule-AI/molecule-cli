@@ -4,7 +4,7 @@ Go CLI for the Molecule AI agent platform. Wraps the platform's workspace runtim
 
 **Users:** Platform operators and developers integrating with the Molecule AI platform.
 
-**Repo state (2026-04-16):** Thin/stub. Go module is initialized; core CLI commands are not yet implemented. CI (Go binary release via GoReleaser + GitHub Actions) is wired up.
+**Repo state:** Core commands implemented. 32 integration tests in `cmd/molecule/molecule_test.go`.
 
 ---
 
@@ -23,14 +23,12 @@ This CLI is the primary user-facing tool for interacting with the Molecule AI pl
 # Build the binary to ./bin/molecule (or $GOBIN/molecule)
 go build -o bin/molecule ./cmd/molecule
 
-# Run tests (none yet; add as commands are implemented)
+# Run tests — uses httptest.Server fixtures, no live platform required
 go test ./...
 
 # Run the CLI locally (requires platform env vars — see Section 5)
 ./bin/molecule --help
 ```
-
-There is no `main.go` or `cmd/molecule/main.go` yet. Creating it is the first implementation task. The module path will be auto-detected from `go.mod`.
 
 ## 3. Go Module Conventions
 
@@ -131,8 +129,8 @@ See `known-issues.md` at the repo root for the full tracked list.
 - [x] Control plane API client (initialized with `MOLECULE_API_URL`)
 - [ ] Workspace runtime client (for dev/proxy mode)
 - [ ] Configuration file (e.g., `~/.config/molecule/cli.yaml`) — workspace template per platform rules
-- [ ] Unit tests for core command logic
-- [ ] `molecule init` (bootstrap local workspace config)
+- [x] Unit tests for core command logic (32 integration tests)
+- [x] `molecule init` (bootstrap local workspace config)
 
 **Platform constraint reminders (from `constraints-and-rules.md`):**
 - Postgres is the source of truth. CLI commands that mutate state ultimately write to Postgres via the control plane.
