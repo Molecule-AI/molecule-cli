@@ -11,13 +11,21 @@ on:
       - '**.go'
       - 'go.mod'
       - 'go.sum'
-      - '.github/workflows/ci.yml'
+      - '.gitea/workflows/*.yml'
+      - '.gitea/workflows/*.yaml'
+      - '.gitea/scripts/**'
+      - '.gitea/sop-checklist-config.yml'
+      - '.gitea/sop-checklist-config.yaml'
   pull_request:
     paths:
       - '**.go'
       - 'go.mod'
       - 'go.sum'
-      - '.github/workflows/ci.yml'
+      - '.gitea/workflows/*.yml'
+      - '.gitea/workflows/*.yaml'
+      - '.gitea/scripts/**'
+      - '.gitea/sop-checklist-config.yml'
+      - '.gitea/sop-checklist-config.yaml'
 
 permissions:
   contents: read

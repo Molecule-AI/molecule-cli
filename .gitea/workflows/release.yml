@@ -19,7 +19,11 @@ on:
       - '**.go'
       - 'go.mod'
       - 'go.sum'
-      - '.github/workflows/release.yml'
+      - '.gitea/workflows/*.yml'
+      - '.gitea/workflows/*.yaml'
+      - '.gitea/scripts/**'
+      - '.gitea/sop-checklist-config.yml'
+      - '.gitea/sop-checklist-config.yaml'
       - '.goreleaser.yaml'
 
 permissions:
