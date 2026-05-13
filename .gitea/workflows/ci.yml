@@ -37,3 +37,17 @@ jobs:
         run: go vet ./...
       - name: Test
         run: go test -race -count=1 ./...
+
+  all-required:
+    name: all-required
+    needs: [test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check test result
+        run: |
+          result="${{ needs.test.result }}"
+          if [ "$result" != "success" ]; then
+            echo "Required job test failed (result: $result)"
+            exit 1
+          fi
+          echo "All required jobs passed"
