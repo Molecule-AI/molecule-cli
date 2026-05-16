@@ -1,0 +1,39 @@
+name: gitea-merge-queue
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gitea-merge-queue-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  queue:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out queue script from main
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+
+      - name: Process one queued PR
+        env:
+          GITEA_TOKEN: ${{ secrets.AUTO_SYNC_TOKEN }}
+          GITEA_HOST: git.moleculesai.app
+          REPO: ${{ github.repository }}
+          WATCH_BRANCH: ${{ github.event.repository.default_branch }}
+          QUEUE_LABEL: merge-queue
+          HOLD_LABEL: merge-queue-hold
+          UPDATE_STYLE: merge
+          # Context names: workflow name is "CI / Test", job is "test".
+          # Gitea reports "(push)" for scheduled/cron-triggered runs, not "(pull_request)".
+          # SOP gate posts sop-checklist / all-items-acked (pull_request).
+          REQUIRED_CONTEXTS: >-
+            CI / Test / test (push), sop-checklist / all-items-acked (pull_request)
+        run: python3 .gitea/scripts/gitea-merge-queue.py
