@@ -11,13 +11,13 @@ on:
       - '**.go'
       - 'go.mod'
       - 'go.sum'
-      - '.github/workflows/ci.yml'
+      - '.gitea/workflows/ci.yml'
   pull_request:
     paths:
       - '**.go'
       - 'go.mod'
       - 'go.sum'
-      - '.github/workflows/ci.yml'
+      - '.gitea/workflows/ci.yml'
 
 permissions:
   contents: read

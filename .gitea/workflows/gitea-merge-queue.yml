@@ -31,9 +31,11 @@ jobs:
           QUEUE_LABEL: merge-queue
           HOLD_LABEL: merge-queue-hold
           UPDATE_STYLE: merge
-          # Context names: workflow name is "CI / Test", job is "test".
-          # Gitea reports "(push)" for scheduled/cron-triggered runs, not "(pull_request)".
-          # SOP gate posts sop-checklist / all-items-acked (pull_request).
+          # Context names: CI workflow (.gitea/workflows/ci.yml) is "CI / Test", job is "test"
+          # → "CI / Test / test". The workflow triggers on pull_request events,
+          # so Gitea posts "(pull_request)" suffix. Note: ci.yml is in .gitea/workflows/
+          # but the path filter references .github/workflows/ci.yml — the filter never matches
+          # so the CI only runs via release.yml's pull_request trigger (same test job).
           REQUIRED_CONTEXTS: >-
-            CI / Test / test (push), sop-checklist / all-items-acked (pull_request)
+            CI / Test / test (pull_request)
         run: python3 .gitea/scripts/gitea-merge-queue.py
